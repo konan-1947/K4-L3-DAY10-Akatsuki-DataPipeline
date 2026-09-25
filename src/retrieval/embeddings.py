@@ -1,24 +1,22 @@
 from __future__ import annotations
 
-from functools import lru_cache
-
 from langchain_core.embeddings import Embeddings
-from sentence_transformers import SentenceTransformer
-
-
-@lru_cache(maxsize=4)
-def _load_model(model_name: str) -> SentenceTransformer:
-    return SentenceTransformer(model_name)
+from langchain_openai import OpenAIEmbeddings as LangChainOpenAIEmbeddings
 
 
 class MiniLMEmbeddings(Embeddings):
-    def __init__(self, model_name: str):
-        self.model = _load_model(model_name)
+    """OpenAI embedding adapter kept under the old class name for compatibility.
+
+    The rest of the pipeline already depends on LangChain's ``Embeddings``
+    interface, so switching providers only needs to happen here. The API key
+    is read from ``OPENAI_API_KEY`` by LangChain OpenAI.
+    """
+
+    def __init__(self, model_name: str = "text-embedding-3-small"):
+        self.model = LangChainOpenAIEmbeddings(model=model_name)
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
-        embeddings = self.model.encode(texts, normalize_embeddings=True)
-        return embeddings.tolist()
+        return self.model.embed_documents(texts)
 
     def embed_query(self, text: str) -> list[float]:
-        embedding = self.model.encode([text], normalize_embeddings=True)
-        return embedding[0].tolist()
+        return self.model.embed_query(text)
