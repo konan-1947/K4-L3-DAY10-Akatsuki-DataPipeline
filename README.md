@@ -52,7 +52,7 @@ Nguồn Crossref API (hoặc Snapshot Offline data/raw/)
     ├── 1. Kéo dữ liệu & Lưu bản gốc (Raw Preservation) -> data/raw/crossref_records.json
     ├── 2. Làm sạch & Chuẩn hóa (Transformation)        -> data/clean/papers_clean.csv
     ├── 3. Trạm kiểm soát chất lượng (Quality Gate)     -> Great Expectations 1.x & Freshness
-    ├── 4. Nhúng ngữ nghĩa & Lưu Vector (Index)         -> sentence-transformers + ChromaDB
+    ├── 4. Nhúng ngữ nghĩa & Lưu Vector (Index)         -> OpenAI Embeddings + ChromaDB
     ├── 5. Đánh giá chất lượng RAG (Benchmark)          -> Hit Rate, Token F1, LLM Judge Score
     ├── 6. Thử thách tiêm độc tố dữ liệu (Corruption)   -> Giả lập 6 lỗi dữ liệu thực tế
     └── 7. Phục hồi an toàn & Đối chiếu (Repair)        -> Tái tạo từ Raw & Báo cáo 3 trạng thái
@@ -84,7 +84,7 @@ timeline
 | :--- | :--- | :--- | :--- |
 | **CP0** | Phút 0 – 30 (30m) | Fork repo nhóm, cấu hình môi trường, nạp raw data | Console in `Môi trường sẵn sàng`, tồn tại `data/raw/` |
 | **CP1** | Phút 30 – 65 (35m) | Chuẩn hóa schema, tính `age_days`, dựng Quality Gate GX 1.x | `data/clean/papers_clean.csv`, GX 1.x validation `True` |
-| **CP2** | Phút 65 – 95 (30m) | Build MiniLM embedding, nạp ChromaDB, sinh `test_set.json` | `data/eval/test_set.json`, Chroma collection `papers-baseline` |
+| **CP2** | Phút 65 – 95 (30m) | Build OpenAI embedding, nạp ChromaDB, sinh `test_set.json` | `data/eval/test_set.json`, Chroma collection `papers-baseline` |
 | **CP3** | Phút 95 – 120 (25m) | Chạy Baseline end-to-end, đo Hit Rate & Token F1 | `baseline_metrics.json`, `data/reports/phase1_report.md` |
 | **CP4** | Phút 120 – 165 (45m) | Tiêm 6 lỗi dữ liệu, đo lường sự sụt giảm của RAG | `corruption_log.json`, `corrupted_metrics.json` |
 | **CP5** | Phút 165 – 210 (45m) | Re-run repair từ raw data, xuất báo cáo đối chiếu 3 trạng thái | `corruption_report.md` (đủ 3 cột so sánh) |
@@ -112,7 +112,7 @@ Starter Repo được cấu trúc dạng module hóa rõ ràng:
 ├── src/
 │   ├── core/                <- Cấu hình đường dẫn Paths, settings và utils
 │   ├── ingestion/           <- crossref.py (lấy data), cleaning.py (làm sạch), corruption.py (tiêm lỗi)
-│   ├── retrieval/           <- MiniLM embedding, Chroma index, QA agent
+│   ├── retrieval/           <- OpenAI embedding, Chroma index, QA agent
 │   ├── evaluation/          <- testset.py (sinh đề thi), metrics.py (tính Hit rate, F1)
 │   ├── observability/       <- quality.py (Great Expectations 1.x), reporting.py
 │   └── pipelines/           <- phase1.py (điều phối baseline), corruption_flow.py
@@ -128,8 +128,8 @@ Starter Repo được cấu trúc dạng module hóa rõ ràng:
 └── pyproject.toml           <- Quản lý dependencies (Python 3.11-3.13)
 ```
 
-> ⚠️ **LƯU Ý VỀ CODE KHUNG:**  
-> Các file trong `src/` chứa các khối `TODO(student)` và `raise NotImplementedError`. Đây là bài tập thiết kế kỹ thuật, nhóm cần đọc kỹ docstring và hoàn thiện từng module theo thứ tự hướng dẫn trong [Guide.md](docs/Guide.md).
+> ✅ **TRẠNG THÁI TRIỂN KHAI:**
+> Các module trong `src/` đã được hoàn thiện và pipeline đã chạy end-to-end. Embedding đang dùng `text-embedding-3-small` qua OpenAI API theo cấu hình trong `.env`.
 
 ---
 
@@ -199,7 +199,7 @@ GOOGLE_API_KEY=your_gemini_api_key_here
 ### 👥 Phân chia vai trò gợi ý (Nhóm 4 thành viên):
 - **Thành viên 1 (Pipeline Lead & Integrator):** Điều phối luồng, quản lý cấu hình `core/`, kết nối `phase1.py` và `corruption_flow.py`.
 - **Thành viên 2 (Data Foundation Owner):** Phụ trách thu thập `crossref.py`, làm sạch `cleaning.py` và khôi phục dữ liệu từ Raw.
-- **Thành viên 3 (RAG & Agent Specialist):** Quản lý Embedding MiniLM, ChromaDB vector store, logic truy vấn và QA Agent trong `retrieval/`.
+- **Thành viên 3 (RAG & Agent Specialist):** Quản lý OpenAI Embeddings, ChromaDB vector store, logic truy vấn và QA Agent trong `retrieval/`.
 - **Thành viên 4 (Observability & Evaluation Lead):** Triển khai Great Expectations 1.x trong `quality.py`, Freshness SLA, bộ `testset.py` và sinh báo cáo Markdown đối chiếu.
 
 ---
