@@ -1,0 +1,54 @@
+{
+  "total_errors": 6,
+  "source_rows": 24,
+  "corrupted_rows": 22,
+  "events": [
+    {
+      "type": "drop_latest_records",
+      "count": 4,
+      "paper_ids": [
+        "10.1145/3637528.3671812",
+        "10.1145/3637528.3671808",
+        "10.1145/3637528.3671804",
+        "10.1145/3637528.3671807"
+      ]
+    },
+    {
+      "type": "blank_summary",
+      "count": 1,
+      "paper_ids": [
+        "10.1145/3637528.3671802"
+      ]
+    },
+    {
+      "type": "inject_noise",
+      "count": 1,
+      "paper_ids": [
+        "10.1145/3637528.3671824"
+      ]
+    },
+    {
+      "type": "truncate_title",
+      "count": 1,
+      "paper_ids": [
+        "10.1145/3637528.3671823"
+      ]
+    },
+    {
+      "type": "stale_date",
+      "count": 1,
+      "paper_ids": [
+        "10.1145/3637528.3671822"
+      ],
+      "published": "2025-09-25"
+    },
+    {
+      "type": "duplicate_rows",
+      "count": 2,
+      "paper_ids": [
+        "10.1145/3637528.3671802",
+        "10.1145/3637528.3671824"
+      ]
+    }
+  ]
+}
